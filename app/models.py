@@ -11,7 +11,7 @@ class Admin(Base):
     __tablename__ = "admins"
 
     id = Column(Integer, primary_key=True, index=True)
-    username = Column(EncryptedString, unique=True, nullable=False, index=False)
+    username = Column(String(255), unique=True, nullable=False, index=False)
     hashed_password = Column(String(255), nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 

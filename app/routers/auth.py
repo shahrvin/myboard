@@ -27,7 +27,8 @@ def setup_admin(admin_data: AdminCreate, db: Session = Depends(get_db)):
 
 @router.post("/login", response_model=Token)
 def login(login_data: AdminLogin, db: Session = Depends(get_db)):
-    admin = db.query(Admin).filter(Admin.username == login_data.username).first()
+    admin = db.query(Admin).filter_by(username = login_data.username).first()
+    
     if not admin or not verify_password(login_data.password, admin.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
