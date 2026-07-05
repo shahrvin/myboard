@@ -1,7 +1,10 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel
+from alembic.environment import Any
+from pydantic import BaseModel, Field
+
+from app.enums import BoardVisibility, WidgetType
 
 
 class AdminCreate(BaseModel):
@@ -33,19 +36,38 @@ class WidgetBase(BaseModel):
     visible: bool = True
 
 
-class WidgetCreate(WidgetBase):
-    pass
+class WidgetCreate(BaseModel):
+    widget_type: WidgetType
+    title: str = ""
+    data: dict[str, Any] = Field(default_factory=dict)
+
+    position_x: float = 0
+    position_y: float = 0
+
+    width: float = 320
+    height: float = 240
+
+    z_index: int = 0
+    rotation: float = 0
 
 
 class WidgetUpdate(BaseModel):
-    title: Optional[str] = None
-    widget_type: Optional[str] = None
-    data: Optional[dict] = None
-    position_x: Optional[float] = None
-    position_y: Optional[float] = None
-    z_index: Optional[int] = None
-    visible: Optional[bool] = None
+    title: str | None = None
+    data: dict[str, Any] | None = None
 
+    position_x: float | None = None
+    position_y: float | None = None
+
+    width: float | None = None
+    height: float | None = None
+
+    z_index: int | None = None
+    rotation: float | None = None
+
+    visible: bool | None = None
+    locked: bool | None = None
+
+    version: int
 
 class WidgetResponse(WidgetBase):
     id: int
@@ -53,3 +75,44 @@ class WidgetResponse(WidgetBase):
     updated_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+
+class WidgetPosition(BaseModel):
+    x: float
+    y: float
+    z_index: int = 0
+
+
+class WidgetSize(BaseModel):
+    width: float = Field(gt=0)
+    height: float = Field(gt=0)
+
+
+class BoardCreate(BaseModel):
+    title: str
+    slug: str
+    description: str | None = None
+    visibility: BoardVisibility = BoardVisibility.PRIVATE
+
+
+class BoardUpdate(BaseModel):
+    title: str | None = None
+    description: str | None = None
+    visibility: BoardVisibility | None = None
+    is_archived: bool | None = None
+    version: int
+
+
+class WidgetLayoutUpdate(BaseModel):
+    id: int
+    position_x: float
+    position_y: float
+    width: float
+    height: float
+    z_index: int
+    rotation: float
+
+
+class BoardLayoutUpdate(BaseModel):
+    widgets: list[WidgetLayoutUpdate]
